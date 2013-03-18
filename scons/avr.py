@@ -1,6 +1,9 @@
 import os
 from SCons.Script import *
 
+import os
+from SCons.Script import *
+
 def print_size(env, source, alias='size'):
 	action = Action("$SIZE %s" % source[0].path, cmdstr="Used section sizes:")
 	return env.AlwaysBuild(env.Alias(alias, source, action))
@@ -31,7 +34,7 @@ def setup_gnu_tools(env, prefix):
 	env['CFLAGS'] = ["-std=gnu99", "-Wredundant-decls","-Wnested-externs"]
 	
 	env['CCFLAGS'] = [
-		"-mcpu=" + device['cpu'],
+		"-mmcu=" + device['cpu'],
 		"-gdwarf-2",
 		"-funsigned-char",
 		"-funsigned-bitfields",
@@ -48,6 +51,8 @@ def setup_gnu_tools(env, prefix):
 		#"-fshort-wchar"
 		#"-pedantic"
 	]
+	
+	
 	if 'archOptions' in device:
 		for option in device['archOptions']:
 			env.Append(CCFLAGS = "-%s" % option)
@@ -66,7 +71,6 @@ def setup_gnu_tools(env, prefix):
 	env['ASFLAGS'] = [
 		"-mcpu=" + device['cpu'],
 		"-gdwarf-2",
-		"-mthumb",
 		"-Wa,--gstabs",
 		"-xassembler-with-cpp"
 	]
@@ -79,15 +83,15 @@ def setup_gnu_tools(env, prefix):
 		linkerscript = '"-T%s"' % linkerscript
 	
 	env['LINKFLAGS'] = [
-		"-mcpu=" + device['cpu'],
+		"-mmcu=" + device['cpu'],
 		"-Wl,--gc-sections",
 		"-nostartfiles",
 		linkerscript,
-		"-Wl,--no-wchar-size-warning",
 		"-Wl,--gc-sections",
-		"-Wl,-Map=${TARGET.base}.map,--cref",
+		"-Wl,-Map=${TARGET.base}.map,--cref"
 	]
 	
+
 	sectionToExport = '--only-section .isr_vectors --only-section .text --only-section .rodata --only-section .ctors --only-section .dtors --only-section .data'
 	
 	hexBuilder = Builder(
@@ -118,9 +122,8 @@ def setup_gnu_tools(env, prefix):
 	
 	env.AddMethod(print_size, 'Size')
 
-		
 def generate(env, **kw):
-	setup_gnu_tools(env, 'arm-none-eabi-')
+	setup_gnu_tools(env, 'avr-')
 
 def exists(env):
-	return env.Detect('arm-none-eabi-gcc')
+	return env.Detect('avr-gcc')

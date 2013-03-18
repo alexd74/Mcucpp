@@ -2,6 +2,8 @@
 #include <avr/io.h>
 #include <delegate.h>
 
+using namespace Mcucpp;
+
 class Foo
 {
 public:
@@ -54,9 +56,9 @@ __attribute__((OS_main))
 int main()
 {
 
-	delegate1<void, uint32_t> d(foo, &Foo::Func);
-	delegate1<void, uint32_t> d2(Hello);
-	delegate<int> d3(bar, &Bar::Func);
+	Delegate1<void, uint32_t> d(foo, &Foo::Func);
+	Delegate1<void, uint32_t> d2(Hello);
+	Delegate<int> d3(bar, &Bar::Func);
 
 	d(123);
 	d2(987);

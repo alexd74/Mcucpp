@@ -1,0 +1,41 @@
+import os
+
+K = 1024
+
+Device = \
+{
+	'name' : 'atmega16',
+	'cpu' : 'atmega16',
+	'defines' : [],
+	'archOptions' : [],
+	'clock' : 16000000
+}
+
+
+includePaths = \
+	[
+		'#/Mcucpp',
+		'#/Mcucpp/AVR'
+	]
+
+
+armEnv = Environment(DEVICE = Device, 
+	toolpath = ['#/scons'], 
+	tools=['avr'], 
+	ENV = os.environ,
+	CPPPATH=includePaths)
+	
+armEnv.Append(CCFLAGS = '-Os' )
+
+#print armEnv.Dump()
+
+applicationObjects = armEnv.Object(['delagate.cpp'])
+
+
+
+programElf = armEnv.Program('delegate-test', applicationObjects)
+programListing = armEnv.Disassembly(programElf)
+programBin = armEnv.Binary(programElf)
+programHex = armEnv.Hex(programElf)
+armEnv.Size(programElf, 'delegate-size') 
+armEnv.Alias('delegate', programElf)
